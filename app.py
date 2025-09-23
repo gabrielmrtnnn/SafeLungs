@@ -12,6 +12,17 @@ app = Flask(__name__)
 
 # Load YOLOv8 Classification model
 MODEL_PATH = "best.pt"
+
+import torch
+
+# Override default load agar weights_only=False
+_orig_load = torch.load
+def load_weights_only_false(*args, **kwargs):
+    kwargs["weights_only"] = False
+    return _orig_load(*args, **kwargs)
+torch.load = load_weights_only_false
+
+
 model = YOLO(MODEL_PATH)
 
 # Set the folder to store uploaded images temporarily
