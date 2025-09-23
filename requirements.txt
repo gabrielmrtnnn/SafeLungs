@@ -3,7 +3,7 @@ gunicorn
 torch==2.8.0+cpu
 torchvision==0.23.0+cpu
 --extra-index-url https://download.pytorch.org/whl/cpu
-ultralytics==8.0.0
+ultralytics==8.3.197
 textblob
 fastapi
 uvicorn
