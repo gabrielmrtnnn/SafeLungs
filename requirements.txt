@@ -7,3 +7,4 @@ ultralytics==8.0.0
 textblob
 fastapi
 uvicorn
+opencv-python-headless
