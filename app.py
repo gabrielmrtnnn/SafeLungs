@@ -1,4 +1,6 @@
 from flask import Flask, request, render_template
+import os
+os.environ["ULTRALYTICS_IGNORE_GIT"] = "1"
 from ultralytics import YOLO
 from PIL import Image
 import numpy as np
