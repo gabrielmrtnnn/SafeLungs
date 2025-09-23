@@ -1,20 +1,25 @@
-# ---- TAHAP 1: BUILDER ----
-FROM python:3.10-slim AS builder
+# Use a base Python image
+FROM python:3.13-slim
+
+# Install all necessary system dependencies here
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libgthread-2.0-0 \
+    libsm6 \
+    libxrender1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
 WORKDIR /app
-RUN apt-get update && apt-get install -y libgl1 libglib2.0-0
+
+# Copy requirements and install Python dependencies
+# Now with a cache ID
 COPY requirements.txt .
-RUN --mount=type=cache,target=/root/.cache/pip pip wheel --default-timeout=600 --wheel-dir /wheels -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip-cache \
+    pip install --no-cache-dir -r requirements.txt
 
-# ---- TAHAP 2: FINAL ----
-FROM python:3.10-slim
-WORKDIR /app
-RUN apt-get update && apt-get install -y libgl1 libglib2.0-0
-COPY --from=builder /wheels /wheels
-COPY --from=builder /app/requirements.txt .
-
-# PERUBAHAN KUNCI: Menjadikan satu baris untuk menghindari error tersembunyi
-RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt && rm -rf /wheels /app/requirements.txt
-
+# Copy your application code
 COPY . .
-EXPOSE 8000
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--timeout", "300", "main:app"]
+
+# Set the startup command
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
